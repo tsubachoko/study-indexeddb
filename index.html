@@ -5,13 +5,40 @@
 </head>
 <body>
   <div id='app'>
+    <div>
+      <span>ID</span>
+      <input type="text" v-model="id">
+    </div>
+
+    <div>
+      <span>Name</span>
+      <input type="text" v-model="name">
+    </div>
+
+    <div>
+      <input type="button" value="Add" @click="add">
+    </div>
   </div>
 
   <script src="https://unpkg.com/vue@3.0.5/dist/vue.global.js"></script>
   <script>
-    'use strict';
+    'use strict'
 
     Vue.createApp({
+      data() {
+        return {
+          id: '',
+          name: '',
+        }
+      },
+      methods: {
+        add() {
+          console.log('add')
+        },
+      },
+      mounted() {
+
+      },
     }).mount('#app')
   </script>
 </body>
