@@ -24,20 +24,73 @@
   <script>
     'use strict'
 
+    const dbVersion = 2
+
     Vue.createApp({
       data() {
         return {
           id: '',
           name: '',
+          db: null,
+          request: null,
         }
       },
       methods: {
         add() {
           console.log('add')
+
+          const store = this.getObjectStore('readwrite')
+          const request = store.add({
+            id: this.id,
+            name: this.name,
+            test: 'test',
+          })
+
+          request.onsuccess = (event) => {
+            console.log('add success')
+            console.log(event)
+          }
+
+          request.onerror = (event) => {
+            console.log('add failure')
+            console.log(event)
+          }
+        },
+        getObjectStore(mode) {
+          return this.db.transaction('sample', mode).objectStore('sample')
         },
       },
       mounted() {
+        this.request = indexedDB.open('sample', dbVersion)
 
+        this.request.onupgradeneeded = (event) => {
+          console.log('openDB upgradeneeded')
+          console.log(event)
+
+          const db = event.target.result
+          console.log(db)
+
+          if (event.oldVersion < dbVersion) {
+            db.deleteObjectStore('sample')
+
+            const store = db.createObjectStore('sample', { keyPath: 'id' })
+            store.createIndex('name', 'name', { unique: false })
+            store.createIndex('idAndName', ['id', 'name'], { unique: false })
+
+            console.log(store)
+          }
+        }
+
+        this.request.onsuccess = (event) => {
+          console.log('openDB success')
+
+          this.db = this.request.result
+        }
+
+        this.request.onerror = (event) => {
+          console.log('openDB failure')
+          console.log(event)
+        }
       },
     }).mount('#app')
   </script>
